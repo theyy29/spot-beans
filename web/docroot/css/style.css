@@ -1,0 +1,85 @@
+body{
+    background: rgba(255, 255, 255, 1); /* Songs in playlist background */
+}
+
+#playlist{
+    background: rgba(233, 233, 233, 1);
+    width:20%;
+    height:100vh;
+    float:left;
+    position: fixed;
+}
+
+#playlist-controls{
+    height:100px;
+    font-size:30px;
+    text-align: center;
+}
+
+#song-content{
+    background: rgba(207, 207, 207, 1);
+    width:80%;
+    height:100px;
+    float:right;
+}
+
+.song-img{
+    padding: 10px 0;
+}
+
+.song-info-text{
+    margin:10px 0 0 0;
+}
+
+#song-controls{
+    font-size:50px;
+    text-align: center;
+}
+
+.song-control:hover, .playlist-control:hover{
+    cursor: pointer;
+    background: rgba(0, 137, 237, 1);
+}
+
+#playlist-content{
+    width:80%;
+    float: right;
+}
+
+.playlist-sort{
+    font-weight: bold;
+}
+
+#playlist-song-list ul {
+    display: table;
+    width:100%;
+    border-collapse: collapse;
+}
+
+#playlist-song-list ul li {
+    border: 1px solid #ccc;
+    display:table-row;
+}
+
+#playlist-song-list ul li span {
+    padding: 4px 10px;
+    display: table-cell;
+    border-right:1px solid #ccc;
+}
+
+#playlist-song-list ul li:hover {
+    background:rgba(0,0,0,0.1);
+    cursor: pointer;
+}
+
+.song-play{
+    visibility: hidden;
+}
+
+.song-play:hover{
+    background: rgba(0, 137, 237, 1);
+}
+
+#playlist-song-list ul li:hover .song-play{
+    visibility: visible;
+}
