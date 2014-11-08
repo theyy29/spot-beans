@@ -1,5 +1,6 @@
 body{
     background: rgba(255, 255, 255, 1); /* Songs in playlist background */
+    min-width: 350px;
 }
 
 #playlist{
@@ -8,6 +9,7 @@ body{
     height:100vh;
     float:left;
     position: fixed;
+    border-right: 1px solid rgba(192, 191, 191, 1);
 }
 
 #playlist-controls{
@@ -16,29 +18,37 @@ body{
     text-align: center;
 }
 
+#playlist-list ul li a{
+    border-radius: 0;
+}
+
 #song-content{
-    background: rgba(207, 207, 207, 1);
+    background: rgba(39, 39, 39, 1);;
     width:80%;
     height:100px;
     float:right;
+    color: rgba(231, 231, 231, 1);
 }
 
 .song-img{
+    max-height: 100px;
     padding: 10px 0;
 }
 
 .song-info-text{
-    margin:10px 0 0 0;
+    overflow: hidden;
 }
 
-#song-controls{
-    font-size:50px;
+.song-info-text p{
+    margin: 5px 0 0 0;
+}
+
+#song-controls, #playlist-controls{
     text-align: center;
 }
 
-.song-control:hover, .playlist-control:hover{
-    cursor: pointer;
-    background: rgba(0, 137, 237, 1);
+#song-controls span{
+    margin: 10px 5px;
 }
 
 #playlist-content{
@@ -72,12 +82,25 @@ body{
     cursor: pointer;
 }
 
+#playlist-song-list ul li span i{
+    font-size: 8px;
+}
+
+#playlist-song-list ul li.playlist-sort:hover{
+    background: inherit;
+}
+
+#playlist-song-list ul li.playlist-sort span:hover{
+    background:rgba(0,0,0,0.1);
+}
+
 .song-play{
     visibility: hidden;
 }
 
-.song-play:hover{
-    background: rgba(0, 137, 237, 1);
+.btn.song-play{
+    border: none;
+    border-radius: 0;
 }
 
 #playlist-song-list ul li:hover .song-play{

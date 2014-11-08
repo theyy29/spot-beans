@@ -16,11 +16,11 @@
 <body>
     <div id="playlist" class="">
         <div id="playlist-controls">
-            <span class="glyphicon glyphicon-repeat playlist-control playlist-control-backward"></span>
-            <span class="glyphicon glyphicon-random playlist-control playlist-control-backward"></span>
+            <span class="glyphicon glyphicon-repeat btn btn-default playlist-control-repeat active"></span>
+            <span class="glyphicon glyphicon-random btn btn-default playlist-control-random"></span>
             <br>
-            <span class="glyphicon glyphicon-step-backward playlist-control playlist-control-backward"></span>
-            <span class="glyphicon glyphicon-step-forward playlist-control playlist-control-forward"></span>
+            <span class="glyphicon glyphicon-step-backward btn btn-default playlist-control-backward"></span>
+            <span class="glyphicon glyphicon-step-forward btn btn-default playlist-control-forward"></span>
         </div>
         <div id="playlist-list">
             <ul class="nav nav-pills nav-stacked" role="tablist">
@@ -37,9 +37,9 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div id="song-info" class="col-sm-6">
+                <div id="song-info" class="col-sm-7 col-md-5 col-lg-6">
                     <div class="row">
-                        <div class="col-sm-3">
+                        <div class="col-sm-3 col-md-4 col-lg-2">
                             <img class="img-responsive song-img" src="/img/dpa-tmp.jpg" alt="Album Cover"> <!-- Obviously a placeholder. -->
                         </div>
                         <div class="song-info-text">
@@ -49,10 +49,10 @@
                         </div>
                     </div>
                 </div>
-                <div id="song-controls" class="col-sm-6">
-                    <span class="glyphicon glyphicon-step-backward song-control song-control-backward"></span>
-                    <span class="glyphicon glyphicon-pause song-control song-control-pause"></span>
-                    <span class="glyphicon glyphicon-step-forward song-control song-control-forward"></span>
+                <div id="song-controls" class="col-sm-5 col-md-7 col-lg-6">
+                    <span class="glyphicon glyphicon-step-backward btn btn-default song-control-backward"></span>
+                    <span class="glyphicon glyphicon-pause btn btn-default song-control-pause"></span>
+                    <span class="glyphicon glyphicon-step-forward btn btn-default song-control-forward"></span>
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
                         </div>
@@ -66,23 +66,23 @@
     <div id="playlist-content" class="">
 
         <div id="playlist-song-list">
-            <ul class="nav nav-pills nav-stacked" role="tablist">
+            <ul class="nav nav-stacked" role="tablist">
                 <li class="playlist-sort">
                     <span class="song-play"></span>
-                    <span class="song-name">Song</span>
-                    <span class="song-artist">Artist</span>
-                    <span class="song-album">Album</span>
-                    <span class="song-time">Time</span>
+                    <span class="song-name">Song <i class="glyphicon glyphicon-chevron-down"></i></span>
+                    <span class="song-artist">Artist <i class="glyphicon glyphicon-chevron-down"></i></span>
+                    <span class="song-album">Album <i class="glyphicon glyphicon-chevron-down"></i></span>
+                    <span class="song-time">Time <i class="glyphicon glyphicon-chevron-down"></i></span>
                 </li>
                 <li>
-                    <span class="glyphicon glyphicon-play song-play"></span>
+                    <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play"></span>
                     <span class="song-name">Song2</span>
                     <span class="song-artist">Artist name</span>
                     <span class="song-album">Album name</span>
                     <span class="song-time">time</span>
                 </li>
                 <li>
-                    <span class="glyphicon glyphicon-play song-play"></span>
+                    <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play"></span>
                     <span class="song-name">Song asdasdsadadas ad sada</span>
                     <span class="song-artist">Artist name</span>
                     <span class="song-album">Album name</span>
