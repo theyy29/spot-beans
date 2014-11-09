@@ -204,7 +204,7 @@ function getCurrentTime(){
 
 setInterval(function() {
     getCurrentTime();
-}, 1000);
+}, 10000);
 
 function playSong(songid, playlistid){
     console.log("PLAY SONG:"+songid+", ON:"+playlistid)
