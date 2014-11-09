@@ -67,7 +67,7 @@ function getSongList(id){
     }).done(function(result){
         if(result) {
 
-            console.log("ASKING FOR PLAYLIST:"+id);
+            console.log("ASKING FOR PLAYLIST: "+id);
             
             $("#playlist-list ul li").removeClass("active"); // clear all the active classes from the platlists.
 
@@ -219,7 +219,7 @@ function updateProgress(){
 //, 1000);
 
 function playSong(songid, playlistid){
-    console.log("PLAY SONG:"+songid+", ON:"+playlistid)
+    console.log("PLAY SONG: "+songid+", ON: "+playlistid)
     $.ajax({
         url: "ajax.php",
         data: {
@@ -237,7 +237,7 @@ function playSong(songid, playlistid){
 }
 
 function changeSong(direction){
-    console.log("CHANGE:"+direction);
+    console.log("CHANGE: "+direction);
     $.ajax({
         url: "ajax.php",
         data: {
@@ -253,7 +253,7 @@ function changeSong(direction){
 }
 
 function search(term){
-    console.log("SEARCH:"+term);
+    console.log("SEARCH: "+term);
     $.ajax({
         url: "ajax.php",
         data: {

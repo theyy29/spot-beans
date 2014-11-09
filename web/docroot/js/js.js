@@ -57,7 +57,7 @@ $(document).ready(function() {
 
     $(document).on("click", ".song-play", function(){
         var trackid = $(this).parent().attr("id");
-        var playlistid = $("#playlist-list ul li").attr("id");
+        var playlistid = $("#playlist-list ul li.active a").attr("id");
         playSong(trackid, playlistid);
     });
 
