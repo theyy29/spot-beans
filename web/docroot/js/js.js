@@ -1,3 +1,6 @@
+var ajaxDone = {"getPlaylists":0, "getSongInfo":0, "isPlaying":0, "getCurrentTime":0 };
+
+
 $(document).ready(function() {
 
     $(document).on("click", "#playlist-btn", function() {
@@ -56,12 +59,7 @@ $(document).ready(function() {
     getPlaylists();
     getSongInfo();
     isPlaying();
-
-    if ($("#playlist-list ul li").hasClass("active")){
-        var id = $(this).attr('id');
-        id = id.replace(/:/g,''); // remove ":" from id
-        getSongList(id);
-    }
+    getCurrentTime();
 });
 
 /* http://stackoverflow.com/a/16983846 */
@@ -212,5 +210,25 @@ function sortClass(classEle, sortDescending) {
             </li>\
         ";
         $("#playlist-song-list ul").append(li);
+    }
+}
+
+function runAfterAjax(){
+    if (ajaxDone["getPlaylists"]   == 0 ||
+        ajaxDone["getSongInfo"]    == 0 ||
+        ajaxDone["isPlaying"]      == 0 ||
+        ajaxDone["getCurrentTime"] == 0)
+        return;
+
+    if ($("#playlist-list ul li").hasClass("active")){
+        console.log("Has class active");
+        var id = $(this).attr('id');
+        id = id.replace(/:/g,''); // remove ":" from id
+        getSongList(id);
+    } else {
+        console.log("Doesn't have class active");
+        $("#playlist-list ul li").first().addClass("active");
+        var id = $("#playlist-list ul li").first().attr('id');
+        getSongList(id);
     }
 }

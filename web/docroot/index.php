@@ -56,6 +56,7 @@
                                 <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
                                 </div>
                             </div>
+                            <p id="current-time" style="margin: -20px 0 0 0;"></p>
                         </div>
                     </div>
                 </div>

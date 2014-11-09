@@ -43,6 +43,10 @@ function getPlaylists(){
                 $("#playlist-list ul").append(li);
             }
         }
+        if(!ajaxDone["getPlaylists"]){
+            ajaxDone["getPlaylists"] = 1;
+            runAfterAjax();
+        }
     });
 }
 
@@ -114,6 +118,7 @@ function getSongInfo(){
             var song = JSON.parse(result);
 
             var s = song["songs"][0];
+            // var p = song["playlists"][0]; // undefined?
 
             var track        = s.track;
             var trackId      = s.trackid;
@@ -135,6 +140,10 @@ function getSongInfo(){
 
             $("#song-info div.row").append(div);
         }
+        if(!ajaxDone["getSongInfo"]){
+            ajaxDone["getSongInfo"] = 1;
+            runAfterAjax();
+        }
     });
 }
 
@@ -154,5 +163,31 @@ function isPlaying(){
             $("#song-control-toggle").removeClass("glyphicon-pause");
             $("#song-control-toggle").addClass("glyphicon-play");
         }
+        if(!ajaxDone["isPlaying"]){
+            ajaxDone["isPlaying"] = 1;
+            runAfterAjax();
+        }
     });
 }
+
+function getCurrentTime(){
+    $.ajax({
+        url: "ajax.php",
+        data: {
+            operation: "get-data",
+            data: "current-time"
+        },
+        type: "post",
+    }).done(function(result){
+        $("#current-time").text(result);
+        console.log("TIME:"+toString(result));
+        if(!ajaxDone["getCurrentTime"]){
+            ajaxDone["getCurrentTime"] = 1;
+            runAfterAjax();
+        }
+    });
+}
+
+setInterval(function() {
+    getCurrentTime()
+}, 1000);
