@@ -1,6 +1,17 @@
 body{
     background: rgba(255, 255, 255, 1); /* Songs in playlist background */
-    min-width: 350px;
+    min-width: 460px; /* Will change in the future (for better mobile look) */
+}
+
+#overlay{
+    /*background: #000;*/
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 300;
 }
 
 #playlist{
@@ -10,6 +21,7 @@ body{
     float:left;
     position: fixed;
     border-right: 1px solid rgba(192, 191, 191, 1);
+    transition: left 0.2s ease-in-out;
 }
 
 #playlist-controls{
@@ -58,6 +70,7 @@ body{
 
 .playlist-sort{
     font-weight: bold;
+    white-space: nowrap;
 }
 
 #playlist-song-list ul {
@@ -105,4 +118,42 @@ body{
 
 #playlist-song-list ul li:hover .song-play{
     visibility: visible;
+}
+
+/* Mobile playlist */
+
+#playlist-btn{
+    position: fixed;
+    top:5px;
+    left:-20px;
+    padding:5px 10px 5px 0;
+    z-index: 999;
+    display: none;
+    transition: left 0.2s ease;
+    /*background: black;*/
+}
+
+#playlist-btn:hover{
+    left:-5px;
+}
+
+.playlist-toggle{
+    left:0 !important;
+}
+
+@media all and (max-width: 767px){
+    #playlist{
+        z-index: 500;
+        width: 50vw;
+        left:-50vw; /* Used for cool effects not using js (instead of display:hidden) */
+    }
+    #song-content{
+        width: 100%;
+    }
+    #playlist-content{
+        width: 100%;
+    }
+    #playlist-btn{
+        display: block;
+    }
 }
