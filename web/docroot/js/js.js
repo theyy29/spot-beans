@@ -23,8 +23,24 @@ $(document).ready(function() {
         return false;
     });
 
-    getSongList();
+    $(document).on("click", "#playlist-list ul li", function(){
+        if (!($(this).hasClass("active"))){
+            var id = $(this).attr('id');
+            id = id.replace(/[^\d.]/g, ""); // remove everything but numbers
+            // console.log(id)
+            getSongList(id);
+        }
+    });
+
     getPlaylists();
+    getSongInfo();
+    isPlaying();
+
+    if ($("#playlist-list ul li").hasClass("active")){
+        var id = $(this).attr('id');
+        id = id.replace(/[^\d.]/g, ""); // remove everything but numbers
+        getSongList(id);
+    }
 });
 
 /* http://stackoverflow.com/a/16983846 */
@@ -129,6 +145,7 @@ function sortClass(classEle, sortDescending) {
     if(sortDescending)
         song.reverse();
 
+    // change the list of the page
     // for(var i = 0, l = song.length; i < l; i++)
     //     song[i].innerHTML = vals[i];
 }
