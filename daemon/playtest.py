@@ -1,7 +1,10 @@
 
 
-from spotify import spotify
+import spotify
 import threading
+import time
+
+
 
 logged_in_event = threading.Event()
 def connection_state_listener(session):
@@ -18,8 +21,29 @@ session.on(spotify.SessionEvent.CONNECTION_STATE_UPDATED, connection_state_liste
 # Log in
 session.login("disambiguity", "spot-beans");
 
+# Init audio
+audio = spotify.PortAudioSink(session)
+loop = spotify.EventLoop(session)
+loop.start()
+
 while not logged_in_event.wait(0.1):
     session.process_events()
 
-album = session.get_album('spotify:album:0XHp09qTpqJJQwa2zFxAAE')
-album.load()
+#search = session.search("Still loving you");
+#search = session.search("time pink floyd");
+search = session.search("Burnin for you blue oyster cult");
+
+search.load()
+
+print(search.tracks[0].load().name);
+song = search.tracks[0]
+song.load()
+session.player.load(song)
+session.player.play()
+
+session.player.pause()
+session.player.play()
+
+while 1:
+    time.sleep(100);
+
