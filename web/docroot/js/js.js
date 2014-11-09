@@ -23,9 +23,6 @@ $(document).ready(function() {
         return false;
     });
 
-    $(".dot").dotdotdot({
-    });
-
     getSongList();
     getPlaylists();
 });
