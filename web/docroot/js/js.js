@@ -17,6 +17,7 @@ $(document).ready(function() {
 	});
 });
 
+/* http://stackoverflow.com/a/16983846 */
 $(function () 
 {
     $(".resizable1").resizable(
@@ -28,8 +29,9 @@ $(function ()
             var parent = ui.element.parent();
             var remainingSpace = parent.width() - ui.element.outerWidth(),
                 divTwo = ui.element.next(),
-                divTwoWidth = (remainingSpace - (divTwo.outerWidth() - divTwo.width()))/parent.width()*100+20+"%";
-                divTwo.width(divTwoWidth);
+                divTwoWidth = (remainingSpace - (divTwo.outerWidth() - divTwo.width()))/parent.width()*100+1+"%";
+                divTwo.width(divTwoWidth); // added 1px because of border ocd;
+            console.log(divTwoWidth);
         },
         stop: function(e, ui) 
         {
