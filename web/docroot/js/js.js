@@ -49,11 +49,24 @@ $(document).ready(function() {
 
     $(document).on("click", "#playlist-list ul li", function(){
         if (!($(this).hasClass("active"))){
-            var id = $(this).attr('id');
-            id = id.replace(/:/g,''); // remove ":" from id
-            console.log(id)
+            var id = $(this).children("a").attr('id');
+            console.log("SENDING TO GET PLAYLIST:"+id)
             getSongList(id);
         }
+    });
+
+    $(document).on("click", ".song-play", function(){
+        var trackid = $(this).parent().attr("id");
+        var playlistid = $("#playlist-list ul li").attr("id");
+        playSong(trackid, playlistid);
+    });
+
+    $(document).on("click", "#song-control-backward", function(){
+        changeSong("previous");
+    });
+
+    $(document).on("click", "#song-control-forward", function(){
+        changeSong("next");
     });
 
     getPlaylists();

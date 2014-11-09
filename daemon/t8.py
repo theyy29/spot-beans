@@ -57,9 +57,11 @@ song = playlist.tracks[0]
 song.load()
 session.player.load(song)
 session.player.play()
-session.player.preload(playlist.tracks[1])
+session.player.prefetch(playlist.tracks[1])
 
 ###########################################################################
+
+starttime = ""
 
 # We are [1] playing, [0] at the 0th track, from the [playlist] playlist,
 #       which started playing at [starttime]
@@ -133,7 +135,7 @@ while 1:
             else:
                 clientsocket.send("0")
         elif d == "current-time":
-            clientsocket.write("0");
+            clientsocket.send("0");
         clientsocket.close()
     elif b == "toggle-play-pause" :
         clientsocket.send("1")

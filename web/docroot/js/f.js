@@ -1,3 +1,6 @@
+var percent = 0;
+var fakeResult = 0;
+
 function togglePlayPause(){
     $.ajax({
         url: "ajax.php",
@@ -36,10 +39,10 @@ function getPlaylists(){
                 var playlistName = p.playlistname;
                 var playlistId   = p.playlistid;
 
-                console.log(playlistId);
-                playlistId = playlistId.replace(/:/g,''); // remove ":" from id
+                // console.log(playlistId);
+                playlistIdClean = playlistId.replace(/:/g,''); // remove ":" from id
 
-                var li = "<li id=\"" + playlistId + "\"><a href=\"#\">" + playlistName + "</a></li>";
+                var li = "<li id=\"" + playlistIdClean + "\"><a id=\"" + playlistId + "\" href=\"#\">" + playlistName + "</a></li>";
                 $("#playlist-list ul").append(li);
             }
         }
@@ -62,9 +65,7 @@ function getSongList(id){
     }).done(function(result){
         if(result) {
 
-            console.log(id);
-
-            // NOTE: CHECK IF SONG LIST EXISTS, AND REMOVE TO UPDATE SONG LIST
+            console.log("ASKING FOR PLAYLIST:"+id);
             
             $("#playlist-list ul li").removeClass("active"); // clear all the active classes from the platlists.
 
@@ -88,7 +89,7 @@ function getSongList(id){
                         <span class=\"song-name\">" + track + "</span>\
                         <span class=\"song-artist\">" + artist + "</span>\
                         <span class=\"song-album\">" + album + "</span>\
-                        <span class=\"song-time\">" + duration + "</span>\
+                        <span class=\"song-time\">" + duration / 1000 + "</span>\
                     </li>\
                 ";
 
@@ -96,7 +97,7 @@ function getSongList(id){
             }
 
             id = id.replace(/:/g,''); // remove ":" from id
-            console.log($("#"+id));
+            // console.log($("#"+id));
             $("#"+id).addClass("active");
         }
     });
@@ -113,7 +114,7 @@ function getSongInfo(){
     }).done(function(result){
         if(result) {
 
-            // NOTE: CHECK IF INFO EXISTS, AND REMOVE TO UPDATE SONG INFO
+            $("#song-info div div").remove();
 
             var song = JSON.parse(result);
 
@@ -126,6 +127,8 @@ function getSongInfo(){
             var album        = s.album;
             var albumArtWork = s.albumartwork;
             var duration     = s.duration;
+
+            $("#total-time").text(duration / 1000);
 
             var div = "\
                 <div class=\"col-xs-5 col-sm-3 col-md-4 col-lg-2\">\
@@ -185,9 +188,70 @@ function getCurrentTime(){
             ajaxDone["getCurrentTime"] = 1;
             runAfterAjax();
         }
+        if (result == "") {
+            fakeResult += 100;
+            percent = fakeResult / $("#total-time").text();
+            $("#current-time").text(fakeResult / 1000);
+        } else {
+            percent = result / $("#total-time").text();
+            $("#current-time").text(result / 1000);
+            fakeResult = result; // set fakeresult incase of failure
+        }
+        console.log(percent);
+        $(".progress-bar").css({"width": percent + "%"});
     });
 }
 
 setInterval(function() {
-    getCurrentTime()
+    getCurrentTime();
 }, 1000);
+
+function playSong(songid, playlistid){
+    console.log("PLAY SONG:"+songid+", ON:"+playlistid)
+    $.ajax({
+        url: "ajax.php",
+        data: {
+            operation: "get-data",
+            data: "song",
+            songid: songid,
+            playlistid: playlistid
+        },
+        type: "post",
+    }).done(function(result){
+        if (result == 1) {
+            getSongInfo();
+        }
+    });
+}
+
+function changeSong(direction){
+    console.log("CHANGE:"+direction);
+    $.ajax({
+        url: "ajax.php",
+        data: {
+            operation: "play",
+            data: direction,
+        },
+        type: "post",
+    }).done(function(result){
+        if (result == 1) {
+            getSongInfo();
+        }
+    });
+}
+
+function search(term){
+    console.log("SEARCH:"+term);
+    $.ajax({
+        url: "ajax.php",
+        data: {
+            operation: "play",
+            data: term,
+        },
+        type: "post",
+    }).done(function(result){
+        if (result == 1) {
+            console.log("OK SEARCH RESPONSE");
+        }
+    });
+}

@@ -53,10 +53,11 @@
                             <span id="song-control-toggle" class="glyphicon glyphicon-pause btn btn-default" onclick="togglePlayPause()"></span>
                             <span id="song-control-forward" class="glyphicon glyphicon-step-forward btn btn-default"></span>
                             <div class="progress">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
+                                <div class="progress-bar" role="progressbar" style="width:50%;">
                                 </div>
                             </div>
-                            <p id="current-time" style="margin: -20px 0 0 0;"></p>
+                            <p id="current-time" class="text-left" style="margin: -20px 0 0 0;"></p>
+                            <p id="total-time" class="text-right" style="margin: -20px 0 0 0;"></p>
                         </div>
                     </div>
                 </div>
