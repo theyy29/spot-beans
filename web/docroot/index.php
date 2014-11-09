@@ -33,10 +33,6 @@
             </div>
             <div id="playlist-list">
                 <ul class="nav nav-pills nav-stacked" role="tablist">
-                    <li class="active"><a href="#">Playlist1</a></li>
-                    <li><a href="#">Playlist2</a></li>
-                    <li><a href="#">Playlist3</a></li>
-                    <li><a href="#">Playlist4</a></li>
                 </ul>
             </div>
 
@@ -84,20 +80,6 @@
                             <span id="sort-song-artist">Artist <i class="glyphicon glyphicon-chevron-down"></i></span>
                             <span id="sort-song-album">Album <i class="glyphicon glyphicon-chevron-down"></i></span>
                             <span id="song-time">Time <i class="glyphicon glyphicon-chevron-down"></i></span>
-                        </li>
-                        <li>
-                            <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play dot"></span>
-                            <span class="song-name">CSong2</span>
-                            <span class="song-artist">BArtist jnnjjdkas sss</span>
-                            <span class="song-album">CAlbum name</span>
-                            <span class="song-time">time</span>
-                        </li>
-                        <li>
-                            <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play"></span>
-                            <span class="song-name">BSong asdasdsadadas ad sada</span>
-                            <span class="song-artist">Artist name</span>
-                            <span class="song-album">Album name</span>
-                            <span class="song-time">Utime</span>
                         </li>
                     </ul>
                 </div>
