@@ -235,13 +235,12 @@ function runAfterAjax(){
 
     if ($("#playlist-list ul li").hasClass("active")){
         console.log("Has class active");
-        var id = $(this).attr('id');
-        id = id.replace(/:/g,''); // remove ":" from id
+        var id = $(this).children("a").attr('id');
         getSongList(id);
     } else {
         console.log("Doesn't have class active");
         $("#playlist-list ul li").first().addClass("active");
-        var id = $("#playlist-list ul li").first().attr('id');
+        var id = $("#playlist-list ul li").first().children("a").attr('id');
         getSongList(id);
     }
 }

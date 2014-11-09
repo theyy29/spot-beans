@@ -1,5 +1,6 @@
 var percent = 0;
 var fakeResult = 0;
+var realResult = 0;
 
 function togglePlayPause(){
     $.ajax({
@@ -54,6 +55,7 @@ function getPlaylists(){
 }
 
 function getSongList(id){
+    console.log("ID:::::::::"+id)
     $.ajax({
         url: "ajax.php",
         data: {
@@ -182,29 +184,39 @@ function getCurrentTime(){
         },
         type: "post",
     }).done(function(result){
-        $("#current-time").text(result);
-        console.log("TIME:"+toString(result));
         if(!ajaxDone["getCurrentTime"]){
             ajaxDone["getCurrentTime"] = 1;
             runAfterAjax();
         }
         if (result == "") {
-            fakeResult += 100;
-            percent = fakeResult / $("#total-time").text();
-            $("#current-time").text(fakeResult / 1000);
+            realResult = 0;
         } else {
-            percent = result / $("#total-time").text();
-            $("#current-time").text(result / 1000);
-            fakeResult = result; // set fakeresult incase of failure
+            realResult = result;
         }
-        console.log(percent);
-        $(".progress-bar").css({"width": percent + "%"});
     });
 }
 
 //setInterval(function() {
 //    getCurrentTime();
 //}, 10000);
+
+function updateProgress(){
+    if (realResult == "0") { // start fake timer
+        fakeResult += 100;
+        percent = fakeResult / $("#total-time").text();
+        $("#current-time").text(fakeResult / 1000);
+    } else {
+        percent = realResult / $("#total-time").text();
+        $("#current-time").text(realResult / 1000);
+        fakeResult = realResult; // set fakeresult incase of failure
+    }
+    //console.log(percent);
+    $(".progress-bar").css({"width": percent + "%"});
+}
+
+//setInterval(function() {
+    //pdateProgress();
+//, 1000);
 
 function playSong(songid, playlistid){
     console.log("PLAY SONG:"+songid+", ON:"+playlistid)
