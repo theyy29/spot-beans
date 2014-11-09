@@ -141,7 +141,7 @@ function isPlaying(){
         },
         type: "post",
     }).done(function(result){
-        if(result) { // if playing, show pause
+        if(result == "1") { // if playing, show pause
             $("#song-control-toggle").addClass("glyphicon-pause");
             $("#song-control-toggle").removeClass("glyphicon-play");
         } else { // else, show play

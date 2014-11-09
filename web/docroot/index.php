@@ -25,11 +25,11 @@
 
         <div id="playlist" class="resizable resizable1">
             <div id="playlist-controls">
-                <span class="glyphicon glyphicon-repeat btn btn-default playlist-control-repeat active"></span>
-                <span class="glyphicon glyphicon-random btn btn-default playlist-control-random"></span>
+                <span class="glyphicon glyphicon-repeat btn btn-default playlist-control-repeat active" title="Repeat playlist"></span>
+                <span class="glyphicon glyphicon-random btn btn-default playlist-control-random" title="Random ong from playlist"></span>
                 <br>
-                <span class="glyphicon glyphicon-step-backward btn btn-default playlist-control-backward"></span>
-                <span class="glyphicon glyphicon-step-forward btn btn-default playlist-control-forward"></span>
+                <span class="glyphicon glyphicon-step-backward btn btn-default playlist-control-backward" title="Previous playlist"></span>
+                <span class="glyphicon glyphicon-step-forward btn btn-default playlist-control-forward" title="Next playlist"></span>
             </div>
             <div id="playlist-list">
                 <ul class="nav nav-pills nav-stacked" role="tablist">
