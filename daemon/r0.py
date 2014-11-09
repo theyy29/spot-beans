@@ -161,6 +161,11 @@ fd_to_socket = { server.fileno(): server,
 
 
 def readnreply(clientsocket):
+    global playlist
+    global pls
+    global song
+    global playinginfo
+    global session
     s = clientsocket.recv(2048);
     #######################################################################
     # Parse input
@@ -189,14 +194,20 @@ def readnreply(clientsocket):
                                 '"playlists":[{"playlistname":"'  + playlist.name +
                                 '","playlist":"'                  + playlist.link.uri + '"}]}')
         elif d == "playlist":
+            playlist = ""
+            for p in pls:
+                (g, h) = com[2].split(':', 1) # g == id hopefully
+                if p.link.uri == h:
+                    playlist = p
+                    break
             clientsocket.send('{"songs":[')
 #clientsocket.send('{"track":"' +playlist.tracks[0].name + '","trackid":"' + playlist.tracks[0].link.uri + '","artist":"' + playlist.tracks[0].artists[0].load().name + '","album":"' + playlist.tracks[0].album.load().name + '","duration":"' + str(playlist.tracks[0].duration) + '"}')
-            clientsocket.send('{"track":"'          +playlist.tracks[0].name + 
-                        '","trackid":"'       + playlist.tracks[0].link.uri + 
-                        '","artist":"'        + playlist.tracks[0].artists[0].load().name + 
-                        '","album":"'         + playlist.tracks[0].album.load().name + 
-                        '","albumartwork":"'  + playlist.tracks[0].album.cover().load().data_uri + 
-                        '","duration":"'      + str(playlist.tracks[0].duration) + '"}')
+            clientsocket.send('{"track":"'          + playlist.tracks[0].name + 
+                        '","trackid":"'             + playlist.tracks[0].link.uri + 
+                        '","artist":"'              + playlist.tracks[0].artists[0].load().name + 
+                        '","album":"'               + playlist.tracks[0].album.load().name + 
+                        '","albumartwork":"'        + playlist.tracks[0].album.cover().load().data_uri + 
+                        '","duration":"'            + str(playlist.tracks[0].duration) + '"}')
             for so in playlist.tracks[1:]:
                 clientsocket.send(',{"track":"'         + so.name +
                                 '","trackid":"'       + so.link.uri + 
@@ -252,7 +263,7 @@ while True:
                 message_queues[connection] = Queue.Queue()
 
             else:
-                readnreply(s)
+                readnreply(s) #################################### HANDLE THE REQUEST
                 continue
                 data = s.recv(1024)
                 if data:

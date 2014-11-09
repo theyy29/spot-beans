@@ -30,6 +30,10 @@ $in = "operation:" . $_POST["operation"];
 if($_POST["operation"] == "get-data"){
     $in = $in . " data:" . $_POST["data"];
 }
+foreach (array_keys($_POST) as $k=>$v){
+    if($k == "operation" || $k == "data") continue;
+    $in = $in . " " . $k . ":" . $v;
+}
 $out = '';
 
 // echo "Sending HTTP HEAD request...";

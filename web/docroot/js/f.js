@@ -202,9 +202,9 @@ function getCurrentTime(){
     });
 }
 
-setInterval(function() {
-    getCurrentTime();
-}, 10000);
+//setInterval(function() {
+//    getCurrentTime();
+//}, 10000);
 
 function playSong(songid, playlistid){
     console.log("PLAY SONG:"+songid+", ON:"+playlistid)
