@@ -28,6 +28,7 @@ $(document).ready(function() {
 
     getSongList();
     getPlaylists();
+    getSongInfo();
 });
 
 /* http://stackoverflow.com/a/16983846 */
