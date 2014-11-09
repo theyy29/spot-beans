@@ -1,4 +1,4 @@
-spot-beans
-==========
+### To install:
 
-App for streaming music, and administering it from a web interface
+sudo apt-get install pyspotify python-pip python-dev 
+pip install pyspotify
