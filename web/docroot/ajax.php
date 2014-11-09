@@ -11,8 +11,8 @@ $address = "127.0.0.1";
 $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 if ($socket === false) {
     // ERROR
-    echo "socket_create() failed: reason: " . 
-          socket_strerror(socket_last_error()) . "\n";
+    //echo "socket_create() failed: reason: " . 
+          //socket_strerror(socket_last_error()) . "\n";
     echo 0;
     return;
 }
@@ -20,13 +20,16 @@ if ($socket === false) {
 // echo "Attempting to connect to '$address' on port '$service_port'...";
 $result = socket_connect($socket, $address, $service_port);
 if ($result === false) {
-    echo "socket_connect() failed.\nReason: ($result) " .
-          socket_strerror(socket_last_error($socket)) . "\n";
+    //echo "socket_connect() failed.\nReason: ($result) " .
+          //socket_strerror(socket_last_error($socket)) . "\n";
     echo 0;
     return;
 }
 
 $in = "operation:" . $_POST["operation"];
+if($_POST["operation"] == "get-data"){
+    $in = $in . " data:" . $_POST["data"];
+}
 $out = '';
 
 // echo "Sending HTTP HEAD request...";
