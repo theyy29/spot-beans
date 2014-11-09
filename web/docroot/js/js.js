@@ -32,14 +32,14 @@ $(document).ready(function() {
 
     var descAlbum = false;
     $(document).on("click", "#sort-song-album", function() {
-        sortClass("song-name", descAlbum);
+        sortClass("song-album", descAlbum);
         descAlbum = !descAlbum;
         return false;
     });
 
     var descTime = false;
     $(document).on("click", "#sort-song-time", function() {
-        sortClass("song-name", descTime);
+        sortClass("song-time", descTime);
         descTime = !descTime;
         return false;
     });
