@@ -115,7 +115,7 @@ while 1:
                               '","artist":"' + song.artists[0].load().name + 
                               '","album":"' + song.album.load().name + 
                               '","albumartwork":"' + song.album.cover().load().data_uri + 
-                              '","duration":"' + song.duration + '"}]}')
+                              '","duration":"' + str(song.duration) + '"}]}')
         elif d == "playlist":
             clientsocket.send('{"songs":[')
             #clientsocket.send('{"track":"' +playlist.tracks[0].name + '","trackid":"' + playlist.tracks[0].link.uri + '","artist":"' + playlist.tracks[0].artists[0].load().name + '","album":"' + playlist.tracks[0].album.load().name + '","duration":"' + str(playlist.tracks[0].duration) + '"}')
