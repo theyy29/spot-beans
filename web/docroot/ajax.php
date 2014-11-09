@@ -31,8 +31,8 @@ if($_POST["operation"] == "get-data"){
     $in = $in . " data:" . $_POST["data"];
 }
 foreach (array_keys($_POST) as $k=>$v){
-    if($k == "operation" || $k == "data") continue;
-    $in = $in . " " . $k . ":" . $v;
+    if($v == "operation" || $v == "data") continue;
+    $in = $in . " " . $v . ":" . $_POST[$v];
 }
 $out = '';
 

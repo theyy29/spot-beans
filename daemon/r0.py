@@ -197,6 +197,8 @@ def readnreply(clientsocket):
             playlist = ""
             for p in pls:
                 (g, h) = com[2].split(':', 1) # g == id hopefully
+                #h = com[2][9:]
+                print("ID:" + h)
                 if p.link.uri == h:
                     playlist = p
                     break
