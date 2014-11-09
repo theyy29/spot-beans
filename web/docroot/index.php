@@ -46,14 +46,6 @@
                     <div class="row">
                         <div id="song-info" class="col-xs-7 col-sm-7 col-md-5 col-lg-6">
                             <div class="row">
-                                <div class="col-xs-5 col-sm-3 col-md-4 col-lg-2">
-                                    <img class="img-responsive song-img" src="/img/dpa-tmp.jpg" alt="Album Cover"> <!-- Obviously a placeholder. -->
-                                </div>
-                                <div class="song-info-text">
-                                    <p>Song Name</p>
-                                    <p>Artist Name</p>
-                                    <p>Album Name</p>
-                                </div>
                             </div>
                         </div>
                         <div id="song-controls" class="col-xs-5 col-sm-5 col-md-7 col-lg-6">

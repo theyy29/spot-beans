@@ -32,6 +32,7 @@ body{
 
 #playlist-list ul li a{
     border-radius: 0;
+    outline: none;
 }
 
 #song-content{
