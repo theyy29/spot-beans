@@ -36,7 +36,10 @@ function getPlaylists(){
                 var playlistName = p.playlistname;
                 var playlistId   = p.playlistid;
 
-                var li = "<li id=\"playlist-" + playlistId + "\"><a href=\"#" + playlistId + "\">" + playlistName + "</a></li>";
+                console.log(playlistId);
+                playlistId = playlistId.replace(/:/g,''); // remove ":" from id
+
+                var li = "<li id=\"" + playlistId + "\"><a href=\"#\">" + playlistName + "</a></li>";
                 $("#playlist-list ul").append(li);
             }
         }
@@ -54,6 +57,8 @@ function getSongList(id){
         type: "POST",
     }).done(function(result){
         if(result) {
+
+            console.log(id);
 
             // NOTE: CHECK IF SONG LIST EXISTS, AND REMOVE TO UPDATE SONG LIST
             
@@ -86,8 +91,9 @@ function getSongList(id){
                 $("#playlist-song-list ul").append(li);
             }
 
-            // console.log(id);
-            $("#playlist-" + id).addClass("active");
+            id = id.replace(/:/g,''); // remove ":" from id
+            console.log($("#"+id));
+            $("#"+id).addClass("active");
         }
     });
 }

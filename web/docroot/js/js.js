@@ -47,8 +47,8 @@ $(document).ready(function() {
     $(document).on("click", "#playlist-list ul li", function(){
         if (!($(this).hasClass("active"))){
             var id = $(this).attr('id');
-            id = id.replace(/[^\d.]/g, ""); // remove everything but numbers
-            // console.log(id)
+            id = id.replace(/:/g,''); // remove ":" from id
+            console.log(id)
             getSongList(id);
         }
     });
@@ -59,7 +59,7 @@ $(document).ready(function() {
 
     if ($("#playlist-list ul li").hasClass("active")){
         var id = $(this).attr('id');
-        id = id.replace(/[^\d.]/g, ""); // remove everything but numbers
+        id = id.replace(/:/g,''); // remove ":" from id
         getSongList(id);
     }
 });
