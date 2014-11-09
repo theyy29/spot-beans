@@ -58,7 +58,7 @@
                 </div>
                 <div id="song-controls" class="col-xs-5 col-sm-5 col-md-7 col-lg-6">
                     <span class="glyphicon glyphicon-step-backward btn btn-default song-control-backward"></span>
-                    <span class="glyphicon glyphicon-pause btn btn-default song-control-pause"></span>
+                    <span class="glyphicon glyphicon-pause btn btn-default song-control-pause" onclick="togglePlayPause()"></span>
                     <span class="glyphicon glyphicon-step-forward btn btn-default song-control-forward"></span>
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
@@ -100,8 +100,9 @@
 
     </div>
 
-    <script src="js/jquery-2.1.1.min.js"></script>
-    <script src="js/js.js"></script>
+    <script src="/js/jquery-2.1.1.min.js"></script>
+    <script src="/js/js.js"></script>
+    <script src="/js/f.js"></script>
 
 </body>
 </html>
