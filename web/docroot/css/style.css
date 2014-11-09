@@ -157,6 +157,10 @@ body{
 }
 
 @media all and (max-width: 767px){
+    .resizable2{
+        float:none;
+        width: 100%;
+    }
     #playlist{
         z-index: 500;
         width: 50vw;

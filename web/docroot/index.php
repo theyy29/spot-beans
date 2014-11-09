@@ -80,35 +80,34 @@
                     <ul class="nav nav-stacked" role="tablist">
                         <li class="playlist-sort">
                             <span class="song-play"></span>
-                            <span class="song-name">Song <i class="glyphicon glyphicon-chevron-down"></i></span>
-                            <span class="song-artist">Artist <i class="glyphicon glyphicon-chevron-down"></i></span>
-                            <span class="song-album">Album <i class="glyphicon glyphicon-chevron-down"></i></span>
-                            <span class="song-time">Time <i class="glyphicon glyphicon-chevron-down"></i></span>
+                            <span id="sort-song-name">Song <i class="glyphicon glyphicon-chevron-down"></i></span>
+                            <span id="sort-song-artist">Artist <i class="glyphicon glyphicon-chevron-down"></i></span>
+                            <span id="sort-song-album">Album <i class="glyphicon glyphicon-chevron-down"></i></span>
+                            <span id="song-time">Time <i class="glyphicon glyphicon-chevron-down"></i></span>
                         </li>
                         <li>
-                            <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play"></span>
-                            <span class="song-name">Song2</span>
-                            <span class="song-artist">Artist name</span>
-                            <span class="song-album">Album name</span>
+                            <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play dot"></span>
+                            <span class="song-name">CSong2</span>
+                            <span class="song-artist">BArtist jnnjjdkas sss</span>
+                            <span class="song-album">CAlbum name</span>
                             <span class="song-time">time</span>
                         </li>
                         <li>
                             <span class="glyphicon glyphicon-play btn btn-primary btn-sm song-play"></span>
-                            <span class="song-name">Song asdasdsadadas ad sada</span>
+                            <span class="song-name">BSong asdasdsadadas ad sada</span>
                             <span class="song-artist">Artist name</span>
                             <span class="song-album">Album name</span>
-                            <span class="song-time">time</span>
+                            <span class="song-time">Utime</span>
                         </li>
                     </ul>
                 </div>
-
             </div>
         </div>
-
     </div>
 
     <script src="/js/jquery-2.1.1.min.js"></script>
     <script src="/js/jquery-ui-1.9.2.custom.min.js"></script>
+    <script src="/js/jquery.dotdotdot.min.js"></script>
     <script src="/js/js.js"></script>
     <script src="/js/f.js"></script>
 
