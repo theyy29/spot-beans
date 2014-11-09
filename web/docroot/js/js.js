@@ -16,3 +16,30 @@ $(document).ready(function() {
     		$("#playlist").removeClass("playlist-toggle");
 	});
 });
+
+/* http://stackoverflow.com/a/16983846 */
+$(function () 
+{
+    $(".resizable1").resizable(
+    {
+        autoHide: true,
+        handles: 'e',
+        resize: function(e, ui) 
+        {
+            var parent = ui.element.parent();
+            var remainingSpace = parent.width() - ui.element.outerWidth(),
+                divTwo = ui.element.next(),
+                divTwoWidth = (remainingSpace - (divTwo.outerWidth() - divTwo.width()))/parent.width()*100+1+"%";
+                divTwo.width(divTwoWidth); // added 1px because of border ocd;
+            console.log(divTwoWidth);
+        },
+        stop: function(e, ui) 
+        {
+            var parent = ui.element.parent();
+            ui.element.css(
+            {
+                width: ui.element.width()/parent.width()*100+"%",
+            });
+        }
+    });
+});

@@ -7,8 +7,9 @@ function togglePlayPause(){
         type: "POST",
     }).done(function(result){
         alert("RESULT");
-        if(result == "1")
-            // TOGGLE THE IMAGE or class or whatever
-            ;
+        if(result == "1") {
+            $("#song-control-toggle").removeClass("glyphicon-pause");
+            $("#song-control-toggle").addClass("glyphicon-play");
+        }
     });
 }
