@@ -3,7 +3,10 @@ import threading
 import time
 import socket
 import codecs
+import time # we need more to work on the project...
+import select
 
+socket.setdefaulttimeout(3)
 
 logged_in_event = threading.Event()
 def connection_state_listener(session):
@@ -57,7 +60,8 @@ song = playlist.tracks[0]
 song.load()
 session.player.load(song)
 session.player.play()
-session.player.preload(playlist.tracks[1])
+starttime = time.time()
+session.player.prefetch(playlist.tracks[1])
 
 ###########################################################################
 
@@ -75,6 +79,16 @@ serversocket.bind(("localhost", 33889))
 #become a server socket
 serversocket.listen(5)
 
+###########################################################################
+
+#Set up polling
+poller = select.poll()
+poller.register(serversocket, select.POLLPRI | select.POLLIN | select.PULLHUP)
+
+
+fd_to_socket = { serversocket.fileno(): serversocket }
+
+###########################################################################
 
 playing = True
 #playing = False
@@ -82,70 +96,75 @@ playing = True
 
 
 while 1:
+    events = poller.poll(3000) # Three seconds
     (clientsocket, address) = serversocket.accept()
-    s = clientsocket.recv(2048);
-    #######################################################################
-    # Parse input
-    #######################################################################
-    print("Received: \"" + s + "\"")
-    s = s.rstrip()
-    com = s.split(' ')
-    (a, b) = com[0].split(':', 1)
-    print("Operation: \"" + b + "\"")
-    if b == "get-data" :
-        (c, d) = com[1].split(':', 1)
-        print("data: \"" + d + "\"")
-        if d == "playlists":
-            clientsocket.send('{"playlists":[');
-            clientsocket.send('{"playlistname":"' + pls[0].name + '", "playlistid":"' + pls[0].link.uri + '"}')
-            for pl in pls[1:]:
-                clientsocket.send(',{"playlistname":"' + pl.name + '", "playlistid":"' + pl.link.uri + '"}')
-            clientsocket.send(']}');
-        elif d == "now-playing":
-            clientsocket.send('{"songs":[{"track":"'            + song.name + 
-                              '","trackid":"'                   + song.link.uri + 
-                              '","artist":"'                    + song.artists[0].load().name + 
-                              '","album":"'                     + song.album.load().name + 
-                              '","albumartwork":"'              + song.album.cover().load().data_uri + 
-                              '","duration":"'                  + str(song.duration) + '"}],' +
-                              '"playlists":[{"playlistname":"'  + playlist.name +
-                              '","playlist":"'                  + playlist.link.uri + '"}]}')
-        elif d == "playlist":
-            clientsocket.send('{"songs":[')
-            #clientsocket.send('{"track":"' +playlist.tracks[0].name + '","trackid":"' + playlist.tracks[0].link.uri + '","artist":"' + playlist.tracks[0].artists[0].load().name + '","album":"' + playlist.tracks[0].album.load().name + '","duration":"' + str(playlist.tracks[0].duration) + '"}')
-            clientsocket.send('{"track":"'          +playlist.tracks[0].name + 
-                              '","trackid":"'       + playlist.tracks[0].link.uri + 
-                              '","artist":"'        + playlist.tracks[0].artists[0].load().name + 
-                              '","album":"'         + playlist.tracks[0].album.load().name + 
-                              '","albumartwork":"'  + playlist.tracks[0].album.cover().load().data_uri + 
-                              '","duration":"'      + str(playlist.tracks[0].duration) + '"}')
-            for so in playlist.tracks[1:]:
-                clientsocket.send(',{"track":"'         + so.name +
-                                  '","trackid":"'       + so.link.uri + 
-                                  '","artist":"'        + so.artists[0].load().name + 
-                                  '","album":"'         + so.album.load().name + 
-                                  '","albumartwork":"'  + so.album.cover().load().data_uri + 
-                                  '","duration":"'      + str(so.duration) + '"}')
-            clientsocket.send(']}')
-        elif d == "is-playing":
+    if clientsocket:
+        s = clientsocket.recv(2048);
+        #######################################################################
+        # Parse input
+        #######################################################################
+        print("Received: \"" + s + "\"")
+        s = s.rstrip()
+        com = s.split(' ')
+        (a, b) = com[0].split(':', 1)
+        print("Operation: \"" + b + "\"")
+        if b == "get-data" :
+            (c, d) = com[1].split(':', 1)
+            print("data: \"" + d + "\"")
+            if d == "playlists":
+                clientsocket.send('{"playlists":[');
+                clientsocket.send('{"playlistname":"' + pls[0].name + '", "playlistid":"' + pls[0].link.uri + '"}')
+                for pl in pls[1:]:
+                    clientsocket.send(',{"playlistname":"' + pl.name + '", "playlistid":"' + pl.link.uri + '"}')
+                clientsocket.send(']}');
+            elif d == "now-playing":
+                clientsocket.send('{"songs":[{"track":"'            + song.name + 
+                                    '","trackid":"'                   + song.link.uri + 
+                                    '","artist":"'                    + song.artists[0].load().name + 
+                                    '","album":"'                     + song.album.load().name + 
+                                    '","albumartwork":"'              + song.album.cover().load().data_uri + 
+                                    '","duration":"'                  + str(song.duration) + '"}],' +
+                                    '"playlists":[{"playlistname":"'  + playlist.name +
+                                    '","playlist":"'                  + playlist.link.uri + '"}]}')
+            elif d == "playlist":
+                clientsocket.send('{"songs":[')
+#clientsocket.send('{"track":"' +playlist.tracks[0].name + '","trackid":"' + playlist.tracks[0].link.uri + '","artist":"' + playlist.tracks[0].artists[0].load().name + '","album":"' + playlist.tracks[0].album.load().name + '","duration":"' + str(playlist.tracks[0].duration) + '"}')
+                clientsocket.send('{"track":"'          +playlist.tracks[0].name + 
+                            '","trackid":"'       + playlist.tracks[0].link.uri + 
+                            '","artist":"'        + playlist.tracks[0].artists[0].load().name + 
+                            '","album":"'         + playlist.tracks[0].album.load().name + 
+                            '","albumartwork":"'  + playlist.tracks[0].album.cover().load().data_uri + 
+                            '","duration":"'      + str(playlist.tracks[0].duration) + '"}')
+                for so in playlist.tracks[1:]:
+                    clientsocket.send(',{"track":"'         + so.name +
+                                    '","trackid":"'       + so.link.uri + 
+                                    '","artist":"'        + so.artists[0].load().name + 
+                                    '","album":"'         + so.album.load().name + 
+                                    '","albumartwork":"'  + so.album.cover().load().data_uri + 
+                                    '","duration":"'      + str(so.duration) + '"}')
+                clientsocket.send(']}')
+            elif d == "is-playing":
+                if playing:
+                    clientsocket.send("1")
+                else:
+                    clientsocket.send("0")
+            elif d == "current-time":
+                clientsocket.send("0");
+            clientsocket.close()
+        elif b == "toggle-play-pause" :
+            clientsocket.send("1")
+            clientsocket.close()
             if playing:
-                clientsocket.send("1")
+                playing = False
+                session.player.pause()
             else:
-                clientsocket.send("0")
-        elif d == "current-time":
-            clientsocket.write("0");
-        clientsocket.close()
-    elif b == "toggle-play-pause" :
-        clientsocket.send("1")
-        clientsocket.close()
-        if playing:
-            playing = False
-            session.player.pause()
-        else:
-            playing = True
-            session.player.play()
+                playing = True
+                session.player.play()
 
-    clientsocket.close();
+        clientsocket.close();
+    else:
+        print("Time elapased:" + (playinginfo[3] - time.time()))
+        # Update the song
 
-    #time.sleep(100);
+#time.sleep(100);
 
