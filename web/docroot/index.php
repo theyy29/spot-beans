@@ -14,6 +14,13 @@
 </head>
 
 <body>
+
+    <div id="overlay"></div>
+
+    <div id="playlist-btn">
+        <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-th"></span></button>
+    </div>
+
     <div id="playlist" class="">
         <div id="playlist-controls">
             <span class="glyphicon glyphicon-repeat btn btn-default playlist-control-repeat active"></span>
@@ -37,9 +44,9 @@
 
         <div class="container-fluid">
             <div class="row">
-                <div id="song-info" class="col-sm-7 col-md-5 col-lg-6">
+                <div id="song-info" class="col-xs-7 col-sm-7 col-md-5 col-lg-6">
                     <div class="row">
-                        <div class="col-sm-3 col-md-4 col-lg-2">
+                        <div class="col-xs-5 col-sm-3 col-md-4 col-lg-2">
                             <img class="img-responsive song-img" src="/img/dpa-tmp.jpg" alt="Album Cover"> <!-- Obviously a placeholder. -->
                         </div>
                         <div class="song-info-text">
@@ -49,7 +56,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="song-controls" class="col-sm-5 col-md-7 col-lg-6">
+                <div id="song-controls" class="col-xs-5 col-sm-5 col-md-7 col-lg-6">
                     <span class="glyphicon glyphicon-step-backward btn btn-default song-control-backward"></span>
                     <span class="glyphicon glyphicon-pause btn btn-default song-control-pause"></span>
                     <span class="glyphicon glyphicon-step-forward btn btn-default song-control-forward"></span>
