@@ -5,3 +5,4 @@ sudo wget -q -O /etc/apt/sources.list.d/mopidy.list https://apt.mopidy.com/mopid
 sudo apt-get update
 sudo apt-get install libspotify-dev build-essential python-dev python3-dev libffi-dev python-pip
 sudo pip install --pre pyspotify
+sudo apt-get install python-pyaudio python3-pyaudio
