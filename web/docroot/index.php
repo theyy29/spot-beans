@@ -21,7 +21,9 @@
         <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-th"></span></button>
     </div>
 
-    <div id="playlist" class="">
+    <div class="wrap">
+
+    <div id="playlist" class="resizable resizable1">
         <div id="playlist-controls">
             <span class="glyphicon glyphicon-repeat btn btn-default playlist-control-repeat active"></span>
             <span class="glyphicon glyphicon-random btn btn-default playlist-control-random"></span>
@@ -39,6 +41,8 @@
         </div>
 
     </div>
+
+    <div class="resizable resizable2">
 
     <div id="song-content" class="">
 
@@ -95,12 +99,15 @@
                     <span class="song-album">Album name</span>
                     <span class="song-time">time</span>
                 </li>
-            </div>
+            </ul>
         </div>
 
     </div>
 
+    </div>
+
     <script src="js/jquery-2.1.1.min.js"></script>
+    <script src="js/jquery-ui-1.9.2.custom.min.js"></script>
     <script src="js/js.js"></script>
 
 </body>

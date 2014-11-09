@@ -141,6 +141,20 @@ body{
     left:0 !important;
 }
 
+.ui-resizable-e { 
+    cursor: e-resize; 
+    left:98%;
+    width: 10px;
+    background-color: gray;
+    height:100vh;
+    position: absolute;
+    top:0;
+}
+.resizable2{
+    float:right;
+    width:100%;
+}
+
 @media all and (max-width: 767px){
     #playlist{
         z-index: 500;
