@@ -234,7 +234,11 @@ def readnreply(clientsocket):
             session.player.pause()
         else:
             playinginfo[0] = True
-            session.player.play()
+            #session.player.play()
+    elif b == "play":
+        (c, d) = com[1].split(':', 1)
+        print("data: \"" + d + "\"")
+
 
     clientsocket.close();
 
