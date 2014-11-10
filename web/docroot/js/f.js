@@ -86,7 +86,7 @@ function getSongList(id){
                 var duration     = s.duration;
 
                 var li = "\
-                    <li id=\"track-" + trackId + "\" class=\"song\">\
+                    <li id=\"" + trackId + "\" class=\"song\">\
                         <span class=\"glyphicon glyphicon-play btn btn-primary btn-sm song-play\"></span>\
                         <span class=\"song-name\">" + track + "</span>\
                         <span class=\"song-artist\">" + artist + "</span>\
