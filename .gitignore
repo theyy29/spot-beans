@@ -1,3 +1,4 @@
 *.swp
 .*.swp
-daemon/tmp/*
+:/daemon/python/tmp/*
+:/daemon/python/tmp/**/*
