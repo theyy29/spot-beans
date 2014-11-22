@@ -1,1 +1,2 @@
-gdb ./spot-beans
+#gdb ./socketio
+./threading

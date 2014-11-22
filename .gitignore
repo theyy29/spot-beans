@@ -2,3 +2,7 @@
 .*.swp
 daemon/python/tmp/*
 daemon/python/tmp/**/*
+ignore*
+daemon/c/spot-beans
+daemon/c/socketio
+daemon/c/threading
