@@ -57,7 +57,7 @@ $(document).ready(function() {
 
     $(document).on("click", ".song-play", function(){
         var trackid = $(this).parent().attr("id");
-        var playlistid = $("#playlist-list ul li").attr("id");
+        var playlistid = $("#playlist-list ul li.active a").attr("id");
         playSong(trackid, playlistid);
     });
 
@@ -214,7 +214,7 @@ function sortClass(classEle, sortDescending) {
     for (var i = 0; i < song.length; i++) {
         var s = song[i];
         var li = "\
-            <li id=\"track-" + s.trackid + "\" class=\"song\">\
+            <li id=\"" + s.trackid + "\" class=\"song\">\
                 <span class=\"glyphicon glyphicon-play btn btn-primary btn-sm song-play\"></span>\
                 <span class=\"song-name\">" + s.track + "</span>\
                 <span class=\"song-artist\">" + s.artist + "</span>\
