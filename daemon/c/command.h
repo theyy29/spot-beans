@@ -4,6 +4,7 @@
 //#include <unistd.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #ifndef DEBUG
     #define DEBUG 8
@@ -16,18 +17,22 @@
 //  8- finished
 //
 struct Command {
-    char *command;
-    char *reply;
-    unsigned int fdsindex;
-    struct Command *next;
+    char            *command;
+    char            *reply;
+    unsigned int     fdsindex;
+    struct Command  *next;
     struct Command **last;
-    unsigned int state;
+    unsigned int     state;
+    pthread_mutex_t  lock;
+    pthread_cond_t   cond;
 };
 
 typedef struct Command Command;
 
 Command **last;
 Command **first;
+extern pthread_mutex_t cqlast_mutex;
+extern pthread_mutex_t cqfirst_mutex;
 
 void cqueueInit();
 Command *initCommand();

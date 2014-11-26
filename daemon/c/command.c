@@ -2,43 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-//Command **last;
-//Command **first;
-
-// SETUP FOR CONTROL
-// Command **last  = malloc(sizeof(Command *));
-// Command **first = malloc(sizeof(Command *));
-// *last  = NULL;
-// *first = NULL;
-
-//while (*first && (*first)->state == 4){
-//int r = send(fds[(*first)->fdsindex].fd, (*first)->reply, strlen((*first)->reply), 0);
-// Finish with the command
-//Command *c = *first;
-//*first = c->next;
-//if(*last == c){
-//    *last = NULL;
-//}
-//debug(0, "Freeing c->command: %lu\n", (long unsigned int)c->command);
-//debug(0, "Freeing c->reply:   %lu\n", (long unsigned int)c->reply);
-//debug(0, "Freeing c:          %lu\n", (long unsigned int)c);
-//free(c->command);
-//free(c->reply);
-//free(c);
-//// That command is done.
-//
-//Command *c = initCommand();
-//c->fdsindex = i;
-//c->command = buf;
-//c->command[nread - 1] = '\0'; // This will work, the buffer is at least one byte bigger than the cuount asked for
-//if(*first == NULL){
-//    *first = c;
-//    *last  = c;
-//} else {
-//    // append it to the last one, and then say the last is it
-//    (*last)->next = c;
-//    *last = c;
-//}
+pthread_mutex_t cqlast_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t cqfirst_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void processCommand(){
     if(!*first) return;
@@ -58,10 +23,21 @@ void processCommand(){
 }
 
 void cqueueInit(){
+    if(pthread_mutex_trylock(&cqlast_mutex)){
+        printf("ERROR LOCKING FOR Command **last IN cqueueInit(): Mutex already locked.\nThis should NEVER happen. cqueueInit() MUST be called BEFORE ANYTHING ELSE\n");
+        pthread_mutex_lock(&cqlast_mutex);
+    }
     last = malloc(sizeof(Command *));
-    first = malloc(sizeof(Command *));
     *last = NULL;
+    pthread_mutex_unlock(&cqlast_mutex);
+
+    if(pthread_mutex_trylock(&cqfirst_mutex)){
+        printf("ERROR LOCKING FOR Command **first IN cqueueInit(): Mutex already locked.\nThis should NEVER happen. cqueueInit() MUST be called BEFORE ANYTHING ELSE\n");
+        pthread_mutex_lock(&cqfirst_mutex);
+    }
+    first = malloc(sizeof(Command *));
     *first = NULL;
+    pthread_mutex_unlock(&cqfirst_mutex);
 }
 
 Command *initCommand(){
@@ -69,6 +45,17 @@ Command *initCommand(){
     memset(c, 0, sizeof(Command));
     c->last = last;
     c->next = NULL;
+    pthread_mutex_init(&(c->lock), NULL);
+    pthread_cond_init(&(c->cond), NULL);
+    return c;
+}
+
+void freeCommand(Command *c){
+    free(c->command);
+    free(c->reply);
+    pthread_mutex_destroy(&(c->lock));
+    pthread_cond_destroy(&(c->cond));
+    free(c);
 }
 
 void debug(int level, const char *fmt, ...){
@@ -82,3 +69,26 @@ void vdebug(int level, const char *fmt, va_list l){
         vprintf(fmt, l);
 }
 
+void *thread_processCommand(void *data){
+    Command *d = *(Command **)data;
+    if(pthread_mutex_trylock(&(d->lock)) != 0){
+        // the command is in use.
+        // there is no point to try to wait to process it. return.
+        return;
+    }
+    Command *p = d;
+    p->reply = (char *)malloc(strlen(p->command) + 1);
+    memcpy(p->reply, p->command, strlen(p->command) + 1);
+
+    pthread_t thread_id = pthread_self();
+
+    printf("Handling Command In THREAD(%lu):\n", thread_id);
+    printf("\tCommand: %s\n", p->command);
+    printf("\tReply:   %s\n", p->reply);
+    printf("\tfds[%d]\n", p->fdsindex);
+    printf("\tnext command: %lu\n", (unsigned long)(p->next));
+    printf("Finished command.\n");
+    p->state = 4;
+    pthread_mutex_unlock(&(d->lock));
+    //pthread_cond_signal(&(d->cond));
+}

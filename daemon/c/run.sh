@@ -1,2 +1,3 @@
 #gdb ./socketio
-./threading
+#./threading
+./tns
