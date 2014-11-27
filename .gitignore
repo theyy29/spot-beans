@@ -8,3 +8,4 @@ daemon/c/spot-beans
 daemon/c/socketio
 daemon/c/threading
 daemon/c/tns
+daemon/c/command.o

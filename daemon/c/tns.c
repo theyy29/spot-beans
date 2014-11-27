@@ -72,6 +72,9 @@ int main(int argc, char *argv[]){
 
     // SETUP FOR CONTROL
     cqueueInit();
+    qinit();
+
+    pthread_t thread;
 
     // SETUP FOR MAIN LOOP
     printf("Allocating %lu bytes for the struct pollfd array\n", sizeof(struct pollfd) * 100);
@@ -106,6 +109,45 @@ int main(int argc, char *argv[]){
         }
         int val = poll(fds, fdsn, timeout);
         if(!val){
+            int r = mutex_trylock(q_mutex);
+            if(r == 0){
+                QueueNode *n = *qFirst;
+                while(n){
+                    printf(".\n");
+                    if(mutex_trylock(n->mutex) == 0){
+                        Command *node = (Command *)(n->nodeData);
+                        printf("node->state == %d\n", node->state);
+                        if(node->state == 0){
+                            // Pass off the mutex to the thread, and go to the next iteration
+                            mutex_unlock(n->mutex);
+                            pthread_create(&thread, NULL, thread_processCommand, n);
+                            n = n->next;
+                            continue;
+                        } else if(node->state == 4){
+                            int result = send(fds[node->fdsindex].fd, node->reply, strlen(node->reply), 0);
+                            if(result != -1){
+                                node->state = 8;
+                            }
+                            mutex_unlock(n->mutex);
+                            n = n->next; // continue;
+                            continue;
+                        } else if (node->state == 8){
+                            QueueNode *tis = n;
+                            // it needs to be deleted.
+                            n = n->next;
+                            freeCommand(tis->nodeData);
+                            mutex_unlock(tis->mutex);
+                            qndestroy(tis);
+                            continue;
+                        }
+                        mutex_unlock(n->mutex);
+                    }
+                    n = n->next;
+                }
+                printf(">\n");
+            }
+            mutex_unlock(q_mutex);
+            /*
             // This will break if we do audio in this thread
             while (*first && (*first)->state == 4){
                 //send(fds[(*first)->fdsindex].fd, (*first)->reply, strlen((*first)->reply), MSG_DONTWAIT);
@@ -131,7 +173,8 @@ int main(int argc, char *argv[]){
                     // That command is done.
                 }
             }
-            processCommand();
+            //processCommand();
+            */
         }
 //      if(!val){
 //          putchar('.');
@@ -178,6 +221,13 @@ int main(int argc, char *argv[]){
                             (*last)->next = c;
                             *last = c;
                         }
+                        QueueNode *n = qninit(c);
+                        //n->last = qLast;
+                        n->prev = *qLast;
+                        *qLast = n;
+                        if(!*qFirst){
+                            *qFirst = *qLast;
+                        }
                     }
                 }
             }
@@ -192,6 +242,9 @@ int main(int argc, char *argv[]){
         // val = 0 -> timeout
         // val > 0 = number of sockets with changes
     }
+
+
+    qdestroy();
     return 0;
 }
 

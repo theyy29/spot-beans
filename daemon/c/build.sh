@@ -1,6 +1,6 @@
 echo --------------------------------------------------
 
-dbg="-g -DDEBUG=4"
+dbg="-g -DDEBUG=4 -DDBGTHREAD=4"
 #dbg=""
 
 echo SKIPPING:
@@ -15,8 +15,8 @@ links="-lpthread"
 
 echo BUILDING:
 echo --------------------------------------------------
-echo gcc -c command.c -o command.o $links
-gcc -c command.c -o command.o $links
+echo gcc -c command.c -o command.o $dbg $links
+gcc -c command.c -o command.o $dbg $links
 echo --------------------------------------------------
 echo gcc command.o tns.c -o tns $dbg $links
 gcc command.o tns.c -o tns $dbg $links
