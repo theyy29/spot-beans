@@ -104,7 +104,8 @@ int main(int argc, char *argv[]){
     printf("Starting main loop with listener\'s fd = %d\n", fds[0].fd);
     while(1){
         int timeout = 10; // a second
-        if(*first == null){
+        //if(*first == null || *q){
+        if(*qFirst == NULL){
             timeout = -1; // wait fo eva
         }
         int val = poll(fds, fdsn, timeout);
@@ -113,10 +114,8 @@ int main(int argc, char *argv[]){
             if(r == 0){
                 QueueNode *n = *qFirst;
                 while(n){
-                    printf(".\n");
-                    if(mutex_trylock(n->mutex) == 0){
+                        if(mutex_trylock(n->mutex) == 0){
                         Command *node = (Command *)(n->nodeData);
-                        printf("node->state == %d\n", node->state);
                         if(node->state == 0){
                             // Pass off the mutex to the thread, and go to the next iteration
                             mutex_unlock(n->mutex);
@@ -134,6 +133,10 @@ int main(int argc, char *argv[]){
                         } else if (node->state == 8){
                             QueueNode *tis = n;
                             // it needs to be deleted.
+                            if(n == *qFirst)
+                                *qFirst = n->next;
+                            if(n == *qLast)
+                                *qLast = n->prev;
                             n = n->next;
                             freeCommand(tis->nodeData);
                             mutex_unlock(tis->mutex);
@@ -144,7 +147,6 @@ int main(int argc, char *argv[]){
                     }
                     n = n->next;
                 }
-                printf(">\n");
             }
             mutex_unlock(q_mutex);
             /*

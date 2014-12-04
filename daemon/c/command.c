@@ -1,4 +1,6 @@
 #include "command.h"
+#include "commands.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
@@ -77,7 +79,7 @@ Mutex *mutex_create(const char *name){
 }
 
 void mutex_init(Mutex *m, const char *name){
-    tdebug(6, "MUTEX CREATION FOR \"%s\"\n", name);
+    tdebug(2, "MUTEX CREATION FOR \"%s\"\n", name);
     m->name = name;
     pthread_mutex_init(&(m->mutex), NULL);
 }
@@ -152,15 +154,15 @@ int mutex_lock(Mutex *m){
     a = (struct timeval *)malloc(sizeof(struct timeval));
 
     gettimeofday(b, NULL);
-    tdebug(6, "LOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
+    tdebug(3, "LOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
 
     int r = pthread_mutex_lock(&(m->mutex));
 
     gettimeofday(a, NULL);
     if(r != 0)
-        tdebug(6, "LOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "LOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
     else
-        tdebug(6, "LOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "LOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
 
     free(a); free(b);
 
@@ -174,15 +176,15 @@ int mutex_trylock(Mutex *m){
     a = (struct timeval *)malloc(sizeof(struct timeval));
 
     gettimeofday(b, NULL);
-    tdebug(6, "TRY LOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
+    tdebug(3, "TRY LOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
 
     int r = pthread_mutex_trylock(&(m->mutex));
 
     gettimeofday(a, NULL);
     if(r != 0)
-        tdebug(6, "TRY LOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "TRY LOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
     else
-        tdebug(6, "TRY LOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "TRY LOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
 
     free(a); free(b);
 
@@ -195,15 +197,15 @@ int mutex_unlock(Mutex *m){
     a = (struct timeval *)malloc(sizeof(struct timeval));
 
     gettimeofday(b, NULL);
-    tdebug(6, "UNLOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
+    tdebug(3, "UNLOCKing \"%s\" at %d.%d\n", m->name, b->tv_sec, b->tv_usec);
 
     int r = pthread_mutex_unlock(&(m->mutex));
 
     gettimeofday(a, NULL);
     if(r != 0)
-        tdebug(6, "UNLOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "UNLOCK    \"%s\" FAILED at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
     else
-        tdebug(6, "UNLOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
+        tdebug(3, "UNLOCKed  \"%s\" at %d.%d\n", m->name, a->tv_sec, a->tv_usec);
 
     free(a); free(b);
 
@@ -245,8 +247,9 @@ void *thread_processCommand(void *data){
         return;
     }
     Command *p = d;
-    p->reply = (char *)malloc(strlen(p->command) + 1);
-    memcpy(p->reply, p->command, strlen(p->command) + 1);
+    // p->reply = (char *)malloc(strlen(p->command) + 1);
+    // memcpy(p->reply, p->command, strlen(p->command) + 1);
+    c_echo(p);
 
     pthread_t thread_id = pthread_self();
 
@@ -258,6 +261,7 @@ void *thread_processCommand(void *data){
     printf("Finished command.\n");
     p->state = 4;
     mutex_unlock(qn->mutex);
-    //pthread_mutex_unlock(&(d->lock));
-    //pthread_cond_signal(&(d->cond));
+}
+
+void parseCommand(Command *c){
 }

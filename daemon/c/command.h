@@ -21,6 +21,10 @@ struct Mutex {
 
 typedef struct Mutex Mutex;
 
+#define COMMAND_UNKNOWN 0
+#define COMMAND_ECHO    1
+#define COMMAND_INFO    2
+
 // state:
 //  1- not started.
 //  2- started
@@ -30,6 +34,7 @@ typedef struct Mutex Mutex;
 struct Command {
     char            *command;
     char            *reply;
+    unsigned int     command_number;
     unsigned int     fdsindex;
     struct Command  *next;
     struct Command **last;

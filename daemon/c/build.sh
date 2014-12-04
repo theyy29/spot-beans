@@ -18,6 +18,9 @@ echo --------------------------------------------------
 echo gcc -c command.c -o command.o $dbg $links
 gcc -c command.c -o command.o $dbg $links
 echo --------------------------------------------------
-echo gcc command.o tns.c -o tns $dbg $links
-gcc command.o tns.c -o tns $dbg $links
+echo gcc -c commands.c -o commands.o $dbg $links
+gcc -c commands.c -o commands.o $dbg $links
+echo --------------------------------------------------
+echo gcc commands.o command.o tns.c -o tns $dbg $links
+gcc commands.o command.o tns.c -o tns $dbg $links
 echo --------------------------------------------------
