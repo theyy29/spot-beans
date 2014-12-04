@@ -1,6 +1,7 @@
 *.o
 *.swp
 .*.swp
+*.so.*
 daemon/python/tmp/*
 daemon/python/tmp/**/*
 ignore*
