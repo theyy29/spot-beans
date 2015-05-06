@@ -10,14 +10,254 @@
 #include <poll.h>
 #include <stdarg.h>
 
-#include "command.h"
+#include "queue/command.h"
 
 #define PORT "9034" // port we're listening on
-#define null ((void *)0)
 #define MAXFDCOUNT 100
 
+#include "net.h"
+
+Incoming::Incoming(){
+    bound = false;
+
+    fdz = NULL;
+
+    cbs = NULL;
+
+    listener = 0;
+
+    fdcount = 0;
+}
+
+Incoming::~Incoming(){
+    if(bound){
+        // close connection...?
+    }
+}
+
+// Bind to a socket. for future, maybe specify force ipv4/ipv6 or preference.
+int Incoming::bindForListen(){
+    if(bound) return -1;
+
+    int err;
+
+    struct addrinfo hints, *ai, *p;
+    // get us a socket and bind it
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC; // AF_INET AF_INET6
+    hints.ai_socktype = SOCK_STREAM; // SOCK_DGRAM or 0
+    hints.ai_flags = AI_PASSIVE;
+
+    if ((err = getaddrinfo(NULL, PORT, &hints, &ai)) != 0) {
+        fprintf(stderr, "selectserver: %s\n", gai_strerror(err));
+        return -1;
+    }
+
+    // Bind to the first one we can
+    for(p = ai; p != NULL; p = p->ai_next) {
+        listener = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (listener < 0) {
+            continue;
+        }
+        int yes = 0;
+        // lose the pesky "address already in use" error message
+        setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+        if (bind(listener, p->ai_addr, p->ai_addrlen) < 0) {
+            close(listener);
+            continue;
+        }
+        break;
+    }
+    // if we got here, it means we didn't get bound
+    if (p == NULL) {
+        fprintf(stderr, "Incoming::bindForListen: failed to bind\n");
+        return -2;
+    }
+
+    freeaddrinfo(ai); // all done with this
+
+    // listen, allowing up to 10 pending connection attempts
+    if (listen(listener, 10) == -1) {
+        perror("listen");
+        return -3;
+    }
+
+    bound = true;
+
+    addDescriptor(listener, POLLIN);
+
+    return 0;
+}
+
+int Incoming::closeAll(){
+    // First things first, unbind the listen socket.
+    close(listener);
+    removeDescriptor(listener);
+    listener = 0;
+
+    if(fdz){
+        for(int i = 0; i < fdcount; ++i){
+            close(fdz[i].fd);
+        }
+
+        free(fdz);
+        fdz = NULL;
+        fdcount = 0;
+    }
+
+    bound = false;
+    return 0;
+}
+
+int Incoming::poll(){
+    // fds array
+    // length of array
+    // timespec *time
+    // sigset_t *sigmask
+
+    if(fdcount == 0) return 0;
+
+    int timeout = 100;
+
+    int val = ::poll(fdz, fdcount, timeout);
+    if(!val);
+    for(int i = 0; val > 0 && i < fdcount ; ++i){
+        // POLLIN POLLOUT POLLERR POLLHUP
+        if(fdz[i].revents & POLLHUP){
+            int v = 0;
+            v = cbs->preClose(fdz[i].fd);
+            if(v < 0){
+                printf("IGNORING SOCKET POLLHUP\n");
+            } else {
+                close(fdz[i].fd);
+                removeDescriptor(fdz[i].fd);
+                cbs->postClose(fdz[i].fd);
+            }
+        } else {
+            if(fdz[i].revents & POLLIN){
+                // either read if its a accepted socket, or accept if its the listening socket.
+                if(fdz[i].fd == listener){
+                    // Accept the socket
+                    int v = 0;
+                    v = cbs->preAccept(fdz[i].fd);
+                    if(v < 0){ // dont accept
+                        printf("IGNORING SOCKET ACCEPT REQUEST!\n");
+                    } else {
+                        struct sockaddr *s = (struct sockaddr *)malloc(sizeof(struct sockaddr));
+                        socklen_t len = 0;
+                        int fd = accept(fdz[0].fd, s, &len);
+                        //debug(8, "NEW SOCKET ACCEPTED: fd is %d\n", fd);
+                        addDescriptor(fd);
+                        free(s);
+                        cbs->postAccept(fd);
+                    }
+                } else {
+                    int nread = 0;
+                    nread = cbs->read(fdz[i].fd);
+                    if(nread == 0){
+                        int v = 0;
+                        v = cbs->preClose(fdz[i].fd);
+                        if(v < 0){
+                            printf("IGNORING SOCKET EOS\n");
+                        } else {
+                            close(fdz[i].fd);
+                            removeDescriptor(fdz[i].fd);
+                            cbs->postClose(fdz[i].fd);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void Incoming::setCallbacks(IncomingCallbacks *cb){
+    cbs = cb;
+//    printf("Setting callbacks...\n");
+//    printf("read       = %lx\n", (unsigned long int)cbs->read);
+//    printf("preAccept  = %lx\n", (unsigned long int)cbs->preAccept);
+//    printf("postAccept = %lx\n", (unsigned long int)cbs->postAccept);
+//    printf("preClose   = %lx\n", (unsigned long int)cbs->preClose);
+//    printf("postClose  = %lx\n", (unsigned long int)cbs->postClose);
+}
+
+void Incoming::addDescriptor(int fd, int events){
+    ++fdcount;
+    printf("ADDing descriptor. (%d). Total: %d\n", fd, fdcount);
+
+    if(!fdz){
+        fdz = (pollfd *)malloc(sizeof(pollfd));
+        memset(fdz, 0, sizeof(pollfd));
+        fdz[0].fd = fd;
+        fdz[0].events = events;
+        return;
+    }
+
+    printf("realloc() %lu -> %lu\n", sizeof(pollfd) * (fdcount-1), sizeof(pollfd) * fdcount);
+    fdz = (pollfd *)realloc(fdz, sizeof(pollfd) * fdcount); // stretch the memory // <--
+    memset(fdz + (fdcount-1), 0, sizeof(pollfd)); // clear the new one
+
+    fdz[fdcount-1].fd = fd;
+    fdz[fdcount-1].events = events;
+}
+
+void Incoming::removeDescriptor(int fd){
+    if(!fdcount) return;
+
+    // find the block with our fd.
+    int i = 0;
+    for(; i < fdcount; ++i)
+        if(fdz[i].fd == fd) break;
+
+    if(i == fdcount - 1){
+        printf("Chopping off the last block\n");
+        if(fdcount - 1 == 0){
+            free(fdz);
+            fdz = NULL;
+            fdcount = 0;
+            return;
+        }
+    } else {
+        printf("Shifting blocks...\n");
+        printf("blocks (%d -> %d) -> (%d -> %d)\n", i+1, fdcount-1, i, fdcount-2);
+
+        memmove(fdz+i, fdz+i+1, sizeof(pollfd) * (fdcount - i - 1));
+    }
+
+    fdz = (pollfd *)realloc(fdz, sizeof(pollfd) * fdcount - 1);
+
+    --fdcount;
+
+    return;
+
+
+/*
+    if(!fdcount) return;
+    printf("REMOVE descriptor. (%d). Total: %d\n", fd, fdcount - 1);
+
+    int i = 0;
+    for(; i < fdcount; ++i){
+        printf("fdz[%d].fd == %d\n", i, fdz[i].fd);
+        if(fdz[i].fd == fd) break;
+    }
+
+    //if(i == 0) { // It shouldnt ever be zero unless we close the listening socket.
+    if(i != fdcount - 1) {
+        memmove((void *)(fdz + i + 1), (const void *)(fdz + i), sizeof(pollfd) * (fdcount - (i-1))); // <--
+    } else {
+        //memmove((void *)(fdz + 1), (const void *)fdz, sizeof(pollfd) * (fdcount-2)); // 1 indexed + offset 1 = 2
+    }
+
+    printf("i == %d; moving block %d and on to %d (%d bytes)\n", i, i+1, i, sizeof(pollfd) * (fdcount - (i-1)));
+    printf("new size: %d\n", fdcount-1);
+    fdz = (pollfd *)realloc(fdz, sizeof(pollfd) * (fdcount-1));
+    --fdcount;
+    */
+}
+
 // get sockaddr, IPv4 or IPv6:
-void *get_in_addr(struct sockaddr *sa)
+void *get_in_addri2(struct sockaddr *sa)
 {
     if (sa->sa_family == AF_INET) {
         return &(((struct sockaddr_in*)sa)->sin_addr);
@@ -25,11 +265,13 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-int acceptconnection(struct pollfd *fds, unsigned int acceptfrom);
-void endconnection(struct pollfd *pfdp);
+/*
 
-int main(int argc, char *argv[]){
-    printf("THREADING WITH SOCKETS.\n");
+int acceptconnection2(struct pollfd *fds, unsigned int acceptfrom);
+void endconnection2(struct pollfd *pfdp);
+
+int main2(int argc, char *argv[]){
+    printf("THREADING WITH SOCKETS AND SPOTIFY.\n");
     int fdmax; // maximum file descriptor number
     int listener; // listening socket descriptor
     char remoteIP[INET6_ADDRSTRLEN];
@@ -38,8 +280,8 @@ int main(int argc, char *argv[]){
     struct addrinfo hints, *ai, *p;
     // get us a socket and bind it
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_family = AF_UNSPEC; // AF_INET AF_INET6
+    hints.ai_socktype = SOCK_STREAM; // SOCK_DGRAM or 0
     hints.ai_flags = AI_PASSIVE;
     if ((rv = getaddrinfo(NULL, PORT, &hints, &ai)) != 0) {
         fprintf(stderr, "selectserver: %s\n", gai_strerror(rv));
@@ -95,6 +337,17 @@ int main(int argc, char *argv[]){
     struct timespec *time = malloc(sizeof(struct timespec));
     time->tv_sec = 0;
     time->tv_nsec = 1000;
+
+
+    // Set up the spotify connection
+    ////////////////////////////////
+
+    // Create a session config thingy
+    
+    struct sp_session_config *config = spi_init_session_config("spkey"); 
+
+    // Create a session
+    sp_session_create(config, NULL);
 
     // main loop
     // int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
@@ -176,7 +429,7 @@ int main(int argc, char *argv[]){
                 }
             }
             //processCommand();
-            */
+            * /
         }
 //      if(!val){
 //          putchar('.');
@@ -250,7 +503,7 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-int acceptconnection(struct pollfd *fds, unsigned int acceptfrom){
+int acceptconnection2(struct pollfd *fds, unsigned int acceptfrom){
     // find the next available element in the array to put the connection into
     // Start at one, which is after the socket we are accepting from.
     int nindex = 1;
@@ -273,8 +526,8 @@ int acceptconnection(struct pollfd *fds, unsigned int acceptfrom){
     return -1;
 }
 
-void endconnection(struct pollfd *pfdp){
+void endconnection2(struct pollfd *pfdp){
     close(pfdp->fd);
     memset((void *)pfdp, 0, sizeof(struct pollfd));
 }
-
+*/

@@ -10,6 +10,8 @@ pthread_mutex_t cqfirst_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 QueueNode **qLast;
 QueueNode **qFirst;
+Command **last;
+Command **first;
 Mutex      *q_mutex;
 // pthread_mutex_t q_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -212,24 +214,24 @@ int mutex_unlock(Mutex *m){
     return r;
 }
 
-inline void debug(int level, const char *fmt, ...){
+void debug(int level, const char *fmt, ...){
     va_list l;
     va_start(l, fmt);
     vdebug(level, fmt, l);
     va_end(l);
 }
-inline void vdebug(int level, const char *fmt, va_list l){
+void vdebug(int level, const char *fmt, va_list l){
     if(DEBUG <= level)
         vprintf(fmt, l);
 }
 
-inline void tdebug(int level, const char *fmt, ...){
+void tdebug(int level, const char *fmt, ...){
     va_list l;
     va_start(l, fmt);
     vtdebug(level, fmt, l);
     va_end(l);
 }
-inline void vtdebug(int level, const char *fmt, va_list l){
+void vtdebug(int level, const char *fmt, va_list l){
     if(DBGTHREAD <= level)
         vprintf(fmt, l);
 }

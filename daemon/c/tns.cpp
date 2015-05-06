@@ -10,29 +10,23 @@
 #include <poll.h>
 #include <stdarg.h>
 
+extern "C" {
+
+#include "command.h"
+
+#include "api.h"
+#include "spi.h"
+
+}
+
+#include "net.h"
+#include "nethandle.h"
+#include "queue/queue.h"
+#include "queue/command.h"
+
 #define PORT "9034" // port we're listening on
 #define null ((void *)0)
 #define MAXFDCOUNT 100
-
-// state:
-//  1- not started.
-//  2- started
-//  4- processed
-//  8- finished
-//
-struct Command {
-    char *command;
-    char *reply;
-    unsigned int fdsindex;
-    struct Command *next;
-    struct Command **last;
-    unsigned int state;
-};
-typedef struct Command Command;
-
-Command **last;
-Command **first;
-
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -45,15 +39,26 @@ void *get_in_addr(struct sockaddr *sa)
 
 int acceptconnection(struct pollfd *fds, unsigned int acceptfrom);
 void endconnection(struct pollfd *pfdp);
-Command *initCommand();
-void processCommand();
 
-void debug(int level, const char *fmt, ...);
-void vdebug(int level, const char *fmt, va_list l);
+int main(int argc, char *argv[]){
+    Queue *q;
+    NetHandle *n;
 
+    q = new Queue();
+    n = new NetHandle(q);
 
-int main(int argc, char *argv[])
-{
+    //Incoming i;
+    //i.bindForListen();
+    while(true){
+        n->poll();
+        Command *c = (Command *)q->dequeue();
+        std::cout << c->DBGTEST();
+        //i.poll();
+    }
+}
+
+int main2(int argc, char *argv[]){
+    printf("THREADING WITH SOCKETS AND SPOTIFY.\n");
     int fdmax; // maximum file descriptor number
     int listener; // listening socket descriptor
     char remoteIP[INET6_ADDRSTRLEN];
@@ -80,7 +85,7 @@ int main(int argc, char *argv[])
             close(listener);
             continue;
         }
-         break;
+        break;
     }
     // if we got here, it means we didn't get bound
     if (p == NULL) {
@@ -95,12 +100,10 @@ int main(int argc, char *argv[])
     }
 
     // SETUP FOR CONTROL
-    //Command **last  = malloc(sizeof(Command *));
-    //Command **first = malloc(sizeof(Command *));
-    last  = malloc(sizeof(Command *));
-    first = malloc(sizeof(Command *));
-    *last  = null;
-    *first = null;
+    cqueueInit();
+    qinit();
+
+    pthread_t thread;
 
     // SETUP FOR MAIN LOOP
     printf("Allocating %lu bytes for the struct pollfd array\n", sizeof(struct pollfd) * 100);
@@ -118,9 +121,20 @@ int main(int argc, char *argv[])
     // timespec *time
     // sigset_t *sigmask
 
-    struct timespec *time = malloc(sizeof(struct timespec));
+    struct timespec *time = (timespec *)malloc(sizeof(struct timespec));
     time->tv_sec = 0;
     time->tv_nsec = 1000;
+
+
+    // Set up the spotify connection
+    ////////////////////////////////
+
+    // Create a session config thingy
+    
+    struct sp_session_config *config = spi_init_session_config("spkey"); 
+
+    // Create a session
+    sp_session_create(config, NULL);
 
     // main loop
     // int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
@@ -130,11 +144,52 @@ int main(int argc, char *argv[])
     printf("Starting main loop with listener\'s fd = %d\n", fds[0].fd);
     while(1){
         int timeout = 10; // a second
-        if(*first == null){
+        //if(*first == null || *q){
+        if(*qFirst == NULL){
             timeout = -1; // wait fo eva
         }
         int val = poll(fds, fdsn, timeout);
         if(!val){
+            int r = mutex_trylock(q_mutex);
+            if(r == 0){
+                QueueNode *n = *qFirst;
+                while(n){
+                        if(mutex_trylock(n->mutex) == 0){
+                        Command *node = (Command *)(n->nodeData);
+                        if(node->state == 0){
+                            // Pass off the mutex to the thread, and go to the next iteration
+                            mutex_unlock(n->mutex);
+                            pthread_create(&thread, NULL, thread_processCommand, n);
+                            n = n->next;
+                            continue;
+                        } else if(node->state == 4){
+                            int result = send(fds[node->fdsindex].fd, node->reply, strlen(node->reply), 0);
+                            if(result != -1){
+                                node->state = 8;
+                            }
+                            mutex_unlock(n->mutex);
+                            n = n->next; // continue;
+                            continue;
+                        } else if (node->state == 8){
+                            QueueNode *tis = n;
+                            // it needs to be deleted.
+                            if(n == *qFirst)
+                                *qFirst = n->next;
+                            if(n == *qLast)
+                                *qLast = n->prev;
+                            n = n->next;
+                            freeCommand((Command *)tis->nodeData);
+                            mutex_unlock(tis->mutex);
+                            qndestroy(tis);
+                            continue;
+                        }
+                        mutex_unlock(n->mutex);
+                    }
+                    n = n->next;
+                }
+            }
+            mutex_unlock(q_mutex);
+            /*
             // This will break if we do audio in this thread
             while (*first && (*first)->state == 4){
                 //send(fds[(*first)->fdsindex].fd, (*first)->reply, strlen((*first)->reply), MSG_DONTWAIT);
@@ -160,7 +215,8 @@ int main(int argc, char *argv[])
                     // That command is done.
                 }
             }
-            processCommand();
+            //processCommand();
+            */
         }
 //      if(!val){
 //          putchar('.');
@@ -207,6 +263,13 @@ int main(int argc, char *argv[])
                             (*last)->next = c;
                             *last = c;
                         }
+                        QueueNode *n = qninit(c);
+                        //n->last = qLast;
+                        n->prev = *qLast;
+                        *qLast = n;
+                        if(!*qFirst){
+                            *qFirst = *qLast;
+                        }
                     }
                 }
             }
@@ -221,6 +284,9 @@ int main(int argc, char *argv[])
         // val = 0 -> timeout
         // val > 0 = number of sockets with changes
     }
+
+
+    qdestroy();
     return 0;
 }
 
@@ -250,40 +316,5 @@ int acceptconnection(struct pollfd *fds, unsigned int acceptfrom){
 void endconnection(struct pollfd *pfdp){
     close(pfdp->fd);
     memset((void *)pfdp, 0, sizeof(struct pollfd));
-}
-
-void processCommand(){
-    if(!*first) return;
-    Command *p = *first;
-    while(p->state == 4){
-        p = p->next;
-    }
-    p->reply = (char *)malloc(strlen(p->command) + 1);
-    memcpy(p->reply, p->command, strlen(p->command) + 1);
-    printf("Handling Command:\n");
-    printf("\tCommand: %s\n", p->command);
-    printf("\tReply:   %s\n", p->reply);
-    printf("\tfds[%d]\n", p->fdsindex);
-    printf("\tnext command: %lu\n", (unsigned long)(p->next));
-    printf("Finished command.\n");
-    p->state = 4;
-}
-
-Command *initCommand(){
-    Command *c = (Command *)malloc(sizeof(Command));
-    memset(c, 0, sizeof(Command));
-    c->last = last;
-    c->next = null;
-}
-
-void debug(int level, const char *fmt, ...){
-    va_list l;
-    va_start(l, fmt);
-    vdebug(level, fmt, l);
-    va_end(l);
-}
-void vdebug(int level, const char *fmt, va_list l){
-    if(DEBUG <= level)
-        vprintf(fmt, l);
 }
 
