@@ -13,7 +13,6 @@
 #include "command.h"
 
 #define PORT "9034" // port we're listening on
-#define null ((void *)0)
 #define MAXFDCOUNT 100
 
 // get sockaddr, IPv4 or IPv6:
@@ -29,7 +28,7 @@ int acceptconnection(struct pollfd *fds, unsigned int acceptfrom);
 void endconnection(struct pollfd *pfdp);
 
 int main(int argc, char *argv[]){
-    printf("THREADING WITH SOCKETS.\n");
+    printf("USAGE:\n\tConnect to localhost:"PORT" and send \'commands\'.\n\t(ie. telnet localhost "PORT")\n\tCOMMANDS:\n\t\tHELP\n\n");
     int fdmax; // maximum file descriptor number
     int listener; // listening socket descriptor
     char remoteIP[INET6_ADDRSTRLEN];
@@ -215,7 +214,7 @@ int main(int argc, char *argv[]){
                         c->fdsindex = i;
                         c->command = buf;
                         c->command[nread - 1] = '\0'; // This will work, the buffer is at least one byte bigger than the cuount asked for
-                        if(*first == null){
+                        if(*first == NULL){
                             *first = c;
                             *last  = c;
                         } else {

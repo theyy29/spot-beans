@@ -261,6 +261,8 @@ void *thread_processCommand(void *data){
     printf("Finished command.\n");
     p->state = 4;
     mutex_unlock(qn->mutex);
+
+    return NULL;
 }
 
 void parseCommand(Command *c){
