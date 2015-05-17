@@ -65,8 +65,8 @@ void qdestroy();
 QueueNode *qninit(void *data);
 void qndestroy(QueueNode *n);
 
-Command **last;
-Command **first;
+extern Command **last;
+extern Command **first;
 extern pthread_mutex_t cqlast_mutex;
 extern pthread_mutex_t cqfirst_mutex;
 
@@ -84,9 +84,9 @@ Mutex *mutex_create(const char *name);
 void mutex_init(Mutex *m, const char *name);
 void mutex_delete(Mutex *m);
 
-inline void debug(int level, const char *fmt, ...);
-inline void vdebug(int level, const char *fmt, va_list l);
-inline void tdebug(int level, const char *fmt, ...);
-inline void vtdebug(int level, const char *fmt, va_list l);
+void debug(int level, const char *fmt, ...);
+void vdebug(int level, const char *fmt, va_list l);
+void tdebug(int level, const char *fmt, ...);
+void vtdebug(int level, const char *fmt, va_list l);
 
 #endif // ifndef COMMAND_H_INCLUDED

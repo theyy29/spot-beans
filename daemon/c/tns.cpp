@@ -10,7 +10,19 @@
 #include <poll.h>
 #include <stdarg.h>
 
+extern "C" {
+
 #include "command.h"
+
+#include "api.h"
+#include "spi.h"
+
+}
+
+#include "net.h"
+#include "nethandle.h"
+#include "queue/queue.h"
+#include "queue/command.h"
 
 #define PORT "9034" // port we're listening on
 #define MAXFDCOUNT 100
@@ -28,6 +40,25 @@ int acceptconnection(struct pollfd *fds, unsigned int acceptfrom);
 void endconnection(struct pollfd *pfdp);
 
 int main(int argc, char *argv[]){
+    printf("USAGE:\n\tConnect to localhost:"PORT" and send \'commands\'.\n\t(ie. telnet localhost "PORT")\n\tCOMMANDS:\n\t\tHELP\n\n");
+
+    Queue *q;
+    NetHandle *n;
+
+    q = new Queue();
+    n = new NetHandle(q);
+
+    //Incoming i;
+    //i.bindForListen();
+    while(true){
+        n->poll();
+        Command *c = (Command *)q->dequeue();
+        std::cout << c->DBGTEST();
+        //i.poll();
+    }
+}
+
+int main2(int argc, char *argv[]){
     printf("USAGE:\n\tConnect to localhost:"PORT" and send \'commands\'.\n\t(ie. telnet localhost "PORT")\n\tCOMMANDS:\n\t\tHELP\n\n");
     int fdmax; // maximum file descriptor number
     int listener; // listening socket descriptor
@@ -91,9 +122,20 @@ int main(int argc, char *argv[]){
     // timespec *time
     // sigset_t *sigmask
 
-    struct timespec *time = malloc(sizeof(struct timespec));
+    struct timespec *time = (timespec *)malloc(sizeof(struct timespec));
     time->tv_sec = 0;
     time->tv_nsec = 1000;
+
+
+    // Set up the spotify connection
+    ////////////////////////////////
+
+    // Create a session config thingy
+    
+    struct sp_session_config *config = spi_init_session_config("spkey"); 
+
+    // Create a session
+    sp_session_create(config, NULL);
 
     // main loop
     // int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout_ts, const sigset_t *sigmask);
@@ -137,7 +179,7 @@ int main(int argc, char *argv[]){
                             if(n == *qLast)
                                 *qLast = n->prev;
                             n = n->next;
-                            freeCommand(tis->nodeData);
+                            freeCommand((Command *)tis->nodeData);
                             mutex_unlock(tis->mutex);
                             qndestroy(tis);
                             continue;
